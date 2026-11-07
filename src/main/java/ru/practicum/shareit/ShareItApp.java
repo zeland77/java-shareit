@@ -9,6 +9,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class ShareItApp {
 
 	public static void main(String[] args) {
+        log.info("Запуск сервера");
 		SpringApplication.run(ShareItApp.class, args);
 	}
 

@@ -33,8 +33,7 @@ public class ItemRepositoryImpl implements ItemRepository {
 
     @Override
     public void deleteByUserIdAndItemId(Long userId, Long itemId) {
-        items.remove(items.stream().filter((i) -> i.getId().equals(itemId))
-                .filter((i) -> i.getId().equals(userId)).findFirst().get());
+        items.removeIf(i -> i.getId().equals(itemId) && i.getOwner().equals(userId));
     }
 
     @Override
@@ -48,15 +47,15 @@ public class ItemRepositoryImpl implements ItemRepository {
 
     @Override
     public Optional<Item> update(Item item) {
-        Item it = items.stream()
-                .filter(i -> i.getOwner().equals(item.getOwner()))
-                .filter(i -> i.getId().equals(item.getId())).findFirst().get();
-        it.setName(item.getName());
-        it.setDescription(item.getDescription());
-        it.setAvailable(item.getAvailable());
         return items.stream()
-                .filter(i -> i.getOwner().equals(item.getOwner()))
-                .filter(i -> i.getId().equals(item.getId())).findFirst();
+                .filter(i -> i.getOwner().equals(item.getOwner()) && i.getId().equals(item.getId()))
+                .findFirst()
+                .map(oldItem -> {
+                    oldItem.setName(item.getName());
+                    oldItem.setDescription(item.getDescription());
+                    oldItem.setAvailable(item.getAvailable());
+                    return oldItem;
+                });
     }
 
     private long getId() {

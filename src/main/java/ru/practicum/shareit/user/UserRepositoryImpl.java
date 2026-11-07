@@ -1,11 +1,13 @@
 package ru.practicum.shareit.user;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @Repository
 public class UserRepositoryImpl implements UserRepository {
     private static final List<User> users = new ArrayList<>();
@@ -29,20 +31,32 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public Optional<User> update(User user) {
-        User oldUser = users.stream().filter(u -> u.getId().equals(user.getId())).findFirst().get();
-        oldUser.setName(user.getName());
-        oldUser.setEmail(user.getEmail());
-        return users.stream().filter(u -> u.getId().equals(user.getId())).findFirst();
+        return users.stream()
+                .filter(u -> u.getId().equals(user.getId()))
+                .findFirst()
+                .map(oldUser -> {
+                    oldUser.setName(user.getName());
+                    oldUser.setEmail(user.getEmail());
+                    return oldUser;
+                });
     }
 
     @Override
     public void delete(Long userId) {
-        users.remove(users.stream().filter(u -> u.getId().equals(userId)).findFirst().get());
+        users.removeIf(u -> u.getId().equals(userId));
     }
 
     @Override
     public boolean isEmailPresent(String email) {
-        return users.stream().anyMatch(u -> u.getEmail().equalsIgnoreCase(email));
+        return users.stream()
+                .anyMatch(u -> u.getEmail().equalsIgnoreCase(email));
+    }
+
+    @Override
+    public boolean isEmailPresent(String email, User excluseUser) {
+        return users.stream()
+                .filter(u -> !u.getId().equals(excluseUser.getId()))
+                .anyMatch(u -> u.getEmail().equalsIgnoreCase(email));
     }
 
     private long getId() {

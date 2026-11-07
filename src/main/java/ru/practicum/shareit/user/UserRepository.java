@@ -16,4 +16,6 @@ public interface UserRepository {
     void delete(Long userId);
 
     boolean isEmailPresent(String email);
+
+    boolean isEmailPresent(String email, User excluseUser);
 }
